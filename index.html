@@ -485,6 +485,7 @@
           });
           const url = new URL(window.location);
           url.searchParams.set("points", JSON.stringify(points));
+          url.searchParams.set("points", JSON.stringify(points));
           window.history.pushState(
             null,
             output.innerText.slice(7).replace(/x(\d+)/g, "x^$1"),
@@ -691,10 +692,12 @@
             desmos.controller.updateViews();
           }
 
+          const params = new URLSearchParams(window.location.search.slice(1));
           try {
-            const points = JSON.parse(
-              new URLSearchParams(window.location.search.slice(1)).get("points")
-            );
+            showingSteps = Boolean(JSON.parse(params.get("steps"))) ?? false;
+          } catch (_err) {}
+          try {
+            const points = JSON.parse(params.get("points"));
             if (Array.isArray(points) && points.length > 0) {
               loadPoints(points);
               calculate();
