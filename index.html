@@ -580,10 +580,23 @@
 
           document.querySelector("[data-matrices]").appendChild(table);
         }
-        function loadExample() {
+        function loadPoints(points) {
           const table = document.querySelector(
             "[data-table-of-values] > tbody"
           );
+
+          for (let i = 0; i < points.length; i++) {
+            const [x, y] = points[i];
+
+            table.rows[i].cells[0].innerText = x;
+            table.rows[i].cells[1].innerText = y;
+            if (i < points.length - 1)
+              table.rows[i].cells[1].dispatchEvent(
+                new KeyboardEvent("keydown", { key: "Tab" })
+              );
+          }
+        }
+        function loadExample() {
           const points = [
             ["-5", "5870"],
             ["-4", "1852"],
@@ -596,16 +609,8 @@
             ["3", "-402"],
             ["4", "-1852"],
           ];
-          for (let i = 0; i < points.length; i++) {
-            const [x, y] = points[i];
 
-            table.rows[i].cells[0].innerText = x;
-            table.rows[i].cells[1].innerText = y;
-            if (i < points.length - 1)
-              table.rows[i].cells[1].dispatchEvent(
-                new KeyboardEvent("keydown", { key: "Tab" })
-              );
-          }
+          loadPoints(points);
         }
         function sup(data) {
           const sup = document.createElement("sup");
@@ -678,6 +683,14 @@
             desmos.controller._hideExpressions();
             desmos.controller.updateViews();
           }
+
+          try {
+            const points = JSON.parse(
+              new URLSearchParams(window.location.search.slice(1)).get("points")
+            );
+            loadPoints(points);
+          } catch (_err) {}
+          calculate();
         }
         window.initialiseDesmos = initialiseDesmos;
       })();
