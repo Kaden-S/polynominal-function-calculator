@@ -483,6 +483,13 @@
               },
             ],
           });
+          const url = new URL(window.location);
+          url.searchParams.set("points", JSON.stringify(points));
+          window.history.pushState(
+            null,
+            output.innerText.slice(7).replace(/x(\d+)/g, "x^$1"),
+            url.toString()
+          );
         }
         /**
          * @param {number} degree
