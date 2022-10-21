@@ -1,3 +1,6 @@
+/**
+ * Copyright 2022 Kaden Sharpin. Subject to the MIT license.
+ */
 var NUMBERS = [
   "first",
   "second",

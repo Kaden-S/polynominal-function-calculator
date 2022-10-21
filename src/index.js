@@ -1,3 +1,6 @@
+/**
+ * Copyright 2022 Kaden Sharpin. Subject to the MIT license.
+ */
 var desmos = {};
 const tr = document.querySelector("[data-table-of-values] > tbody").insertRow();
 tr.appendChild(createCell());
