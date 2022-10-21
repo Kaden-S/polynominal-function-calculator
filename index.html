@@ -1,0 +1,683 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <title>Polynominal Function Calculator</title>
+  </head>
+  <body>
+    <table data-table-of-values>
+      <thead>
+        <tr>
+          <th class="math">x</th>
+          <th class="math">y</th>
+        </tr>
+      </thead>
+      <tbody></tbody>
+      <tfoot></tfoot>
+    </table>
+    <button data-table-of-values-button="example">Load Example</button>
+    <button data-table-of-values-button="calculate">Calculate</button>
+    <button data-table-of-values-button="show-steps">Show Steps</button>
+    <button data-table-of-values-button="clear">Clear</button>
+    <div data-matrices></div>
+    <h2 data-equation></h2>
+    <div data-graph></div>
+    <style>
+      [data-graph] {
+        margin-top: 5em;
+        width: 80%;
+      }
+      [data-equation] {
+        font-weight: normal;
+      }
+      body {
+        font-family: sans-serif;
+      }
+      table {
+        /* border: 1px solid black; */
+        margin-block: 1.5rem;
+        border-spacing: 0;
+      }
+      td, th {
+        border: 1px solid black;
+        text-align: center;
+        width: 10vw;
+      }
+      .math {
+        font-family: serif;
+      }
+    </style>
+    <script>
+      (() => {
+        class Fraction {
+          constructor(numerator = 1, denominator = 1) {
+            this.numerator = numerator;
+            this.denominator = denominator;
+            this.lowestTerms();
+          }
+          /**
+           * @returns {Fraction}
+           */
+          lowestTerms() {
+            const hcf = HCF(this.numerator, this.denominator);
+            this.numerator /= hcf;
+            this.denominator /= hcf;
+            if (this.denominator < 0) {
+              this.numerator *= -1;
+              this.denominator *= -1;
+            }
+            return this;
+          }
+          /**
+           * @param {Fraction | number} by
+           * @param {number} denominator
+           * @returns {Fraction}
+           */
+          multiply(by, denominator = 1) {
+            const numerator = by?.numerator ?? by;
+            denominator = by?.denominator ?? denominator;
+
+            this.numerator *= numerator;
+            this.denominator *= denominator;
+
+            this.lowestTerms();
+            return this;
+          }
+          /**
+           * @param {Fraction | number} by
+           * @param {number} denominator
+           * @returns {Fraction}
+           */
+          divide(by, denominator = 1) {
+            const numerator = by?.numerator ?? by;
+            denominator = by?.denominator ?? denominator;
+
+            this.numerator *= denominator;
+            this.denominator *= numerator;
+
+            this.lowestTerms();
+            return this;
+          }
+          /**
+           * @param {Fraction | number} by
+           * @param {number} denominator
+           * @returns {Fraction}
+           */
+          add(by, denominator = 1) {
+            const numerator1 = by?.numerator ?? by;
+            const denominator1 = by?.denominator ?? denominator;
+            const numerator2 = this.numerator;
+            const denominator2 = this.denominator;
+
+            const lcm = LCM(denominator1, denominator2);
+            const factor1 = lcm / denominator1;
+            const factor2 = lcm / denominator2;
+
+            this.numerator = numerator1 * factor1 + numerator2 * factor2;
+            this.denominator = lcm;
+
+            this.lowestTerms();
+            return this;
+          }
+          /**
+           * @param {Fraction | number} by
+           * @param {number} denominator
+           * @returns {Fraction}
+           */
+          subtract(by, denominator = 1) {
+            const numerator1 = this.numerator;
+            const denominator1 = this.denominator;
+            const numerator2 = by?.numerator ?? by;
+            const denominator2 = by?.denominator ?? denominator;
+
+            const lcm = LCM(denominator1, denominator2);
+            const factor1 = lcm / denominator1;
+            const factor2 = lcm / denominator2;
+
+            this.numerator = numerator1 * factor1 - numerator2 * factor2;
+            this.denominator = lcm;
+
+            this.lowestTerms();
+            return this;
+          }
+          toString() {
+            if (this.denominator === 1) return `${this.numerator}`;
+            return `${this.numerator}/${this.denominator}`;
+          }
+          toNumber() {
+            return this.numerator / this.denominator;
+          }
+          copy() {
+            return new Fraction(this.numerator, this.denominator);
+          }
+          abs() {
+            this.numerator = Math.abs(this.numerator);
+            return this;
+          }
+        }
+        /**
+         * Lowest Common Multiple
+         *
+         */
+        function LCM(a, b) {
+          return (a * b) / HCF(a, b);
+        }
+        /**
+         * Highest Common Factor
+         *
+         */
+        function HCF(a, b) {
+          while (b !== 0) {
+            if (isNaN(a) || isNaN(b)) {
+              console.log(a, b);
+              debugger;
+            }
+
+            const remainder = a % b;
+            (a = b), (b = remainder);
+          }
+          return a;
+        }
+        window.Fraction = Fraction;
+      })();
+    </script>
+    <script>
+      (() => {
+        const NUMBERS = [
+          "first",
+          "second",
+          "third",
+          "fourth",
+          "fifth",
+          "sixth",
+          "seventh",
+          "eighth",
+          "nineth",
+          "tenth",
+        ];
+        const X = 0;
+        const Y = 1;
+        function factorial(n) {
+          if (n <= 1) return n;
+
+          return n * factorial(n - 1);
+        }
+        function getCaretPosition(editableDiv) {
+          if (window.getSelection) {
+            let sel = window.getSelection();
+            if (sel.rangeCount) {
+              let range = sel.getRangeAt(0);
+              if (range.commonAncestorContainer.parentNode == editableDiv)
+                return range.endOffset;
+            }
+          }
+          return 0;
+        }
+        function atEnd(editableDiv) {
+          return editableDiv.innerText.length === getCaretPosition(editableDiv);
+        }
+        function atStart(editableDiv) {
+          return 0 === getCaretPosition(editableDiv);
+        }
+
+        function moveLeft(td) {
+          const row = td.parentElement;
+          if (td === row.cells[Y]) {
+            row.cells[X]?.focus();
+          } else {
+            row.previousElementSibling?.cells[Y]?.focus();
+          }
+        }
+        function moveRight(td) {
+          const row = td.parentElement;
+          if (td === row.cells[Y]) {
+            row.nextElementSibling?.cells[X]?.focus();
+          } else {
+            row.cells[Y]?.focus();
+          }
+        }
+        function moveUp(td) {
+          const row = td.parentElement;
+          if (td === row.cells[Y]) {
+            row.previousElementSibling?.cells[Y]?.focus();
+          } else {
+            row.previousElementSibling?.cells[X]?.focus();
+          }
+        }
+        function moveDown(td) {
+          const row = td.parentElement;
+          if (td === row.cells[Y]) {
+            row.nextElementSibling?.cells[Y]?.focus();
+          } else {
+            row.nextElementSibling?.cells[X]?.focus();
+          }
+        }
+        function createCell(text) {
+          const td = document.createElement("td");
+          td.contentEditable = true;
+          td.innerText = text ?? "";
+          td.addEventListener("keydown", keyListener);
+          return td;
+        }
+        function addRow(row, body) {
+          let previousNum = 1 + Number(row.cells[X]?.innerText);
+          if (isNaN(previousNum)) previousNum = null;
+
+          const tr = body.insertRow();
+          tr.appendChild(createCell(previousNum));
+          tr.appendChild(createCell());
+          return tr;
+        }
+        /** @param {KeyboardEvent} ev */
+        function keyListener(ev) {
+          /** @type {HTMLTableDataCellElement} */
+          const td = ev.target;
+          /** @type {HTMLTableRowElement} */
+          const row = td.parentElement;
+          /** @type {HTMLTableSectionElement} */
+          const body = row.parentElement;
+          switch (ev.key) {
+            case "ArrowLeft":
+              if (atStart(td)) {
+                ev.preventDefault();
+                moveLeft(td);
+              }
+              break;
+            case "ArrowRight":
+              if (atEnd(td)) {
+                ev.preventDefault();
+                moveRight(td);
+              }
+              break;
+            case "ArrowUp":
+              ev.preventDefault();
+              moveUp(td);
+              break;
+            case "ArrowDown":
+              ev.preventDefault();
+              moveDown(td);
+              break;
+            case "Tab":
+              if (ev.shiftKey) break;
+              if (row === body.lastElementChild && td === row.cells[Y]) {
+                ev.preventDefault();
+                addRow(row, body)?.cells?.[0]?.focus();
+              }
+              break;
+            case "Enter":
+              ev.preventDefault();
+
+              if (ev.shiftKey) {
+                moveUp(td);
+                break;
+              }
+
+              if (row === body.lastElementChild) {
+                addRow(row, body);
+              }
+
+              moveDown(td);
+              break;
+            default:
+              break;
+          }
+        }
+        function resetTable() {
+          /** @type {HTMLTableElement} */
+          const table = document.querySelector("[data-table-of-values]");
+
+          table.tFoot.innerText = "";
+          removeExcessCells(table.tHead.rows[0]);
+          Array.from(table.tBodies[0]?.rows).forEach(removeExcessCells);
+          return table;
+        }
+        function removeExcessCells(tr) {
+          while (tr.cells.item(2)) tr.cells.item(2).remove();
+        }
+        async function calculate() {
+          const t = resetTable();
+          resetMatrices();
+          resetEquation();
+
+          for (let x = 0; x < 10; x++) {
+            const diff = addDifference(x);
+            if (diff !== false) {
+              t.tFoot.innerText = `a = ${diff}/${x + 1}! = ${
+                diff / factorial(x + 1)
+              }`;
+              runMatrix(x + 1);
+              break;
+            }
+          }
+        }
+        function addDifference(x) {
+          /** @type {HTMLTableElement} */
+          const table = document.querySelector("[data-table-of-values]");
+
+          const th = table.tHead.rows[0].appendChild(
+            document.createElement("th")
+          );
+          th.innerText = NUMBERS[x];
+          th.classList.add("math");
+
+          const nums = Array.from(table.tBodies[0].rows)
+            .slice(x + 1)
+            .map((row) => {
+              const td = row.insertCell();
+              td.style.transform = `translate(0, -${50 * (x + 1)}%)`;
+              return (td.innerText =
+                Number(row.cells[x + 1].innerText) -
+                  Number(row.previousElementSibling?.cells[x + 1].innerText) ||
+                0);
+            });
+          if (
+            nums.every(
+              (n, i, arr) => arr[Math.min(i + 1, arr.length - 1)] === n
+            )
+          )
+            return nums[0];
+
+          return false;
+        }
+        async function runMatrix(degree) {
+          const body = document.querySelector("[data-table-of-values] > tbody");
+          const points = Array.from(body?.rows).map((el) => [
+            Number(el.cells[X].innerText),
+            Number(el.cells[Y].innerText),
+          ]);
+          if (points.length > 2) {
+            matrix(degree, points);
+          } else {
+            clear();
+          }
+        }
+        function matrix(degree, points) {
+          const showSteps = showingSteps;
+          const matrix = createMatrix(degree, points);
+          const targetLength = degree + 1;
+
+          if (matrix.length < targetLength) {
+            alert("Add more points");
+            return null;
+          }
+
+          while (matrix.length !== targetLength) {
+            if (matrix.length % 2 === 0) {
+              matrix.pop();
+            } else {
+              matrix.shift();
+            }
+          }
+
+          addMatrix(matrix);
+          let solved = solveMatrix(matrix, showSteps);
+          if (showSteps) {
+            solved.forEach(({ matrix, message }) => addMatrix(matrix, message));
+            solved = solved[solved.length - 1].matrix;
+          } else {
+            addMatrix(solved);
+          }
+
+          const output = document.querySelector("[data-equation]");
+          output.innerText = "f(x) = ";
+          for (let x = 0; x < solved.length; x++) {
+            let coefficient = stringify(solved[x][solved[x].length - 1]);
+
+            const num = Number(coefficient);
+            if (num === 0) continue;
+            if (num === 1) coefficient = "";
+            if (x > 0) {
+              if (num < 0) {
+                coefficient = coefficient.slice(1);
+                coefficient = ` - ${coefficient}`;
+              } else {
+                coefficient = ` + ${coefficient}`;
+              }
+            }
+
+            const exponent = degree - x;
+            if (exponent >= 1) {
+              coefficient += "x";
+            }
+
+            output.append(coefficient);
+
+            if (exponent > 1) {
+              output.append(sup(exponent));
+            }
+          }
+
+          const equation = output.innerText
+            .slice(6)
+            .replace(/x/g, "x_{1}")
+            .replace(/x_\{1\}(\d+)/g, "x_{1}^{$1}");
+          desmos?.setExpression?.({
+            id: "2",
+            type: "table",
+            columns: [
+              {
+                latex: "x_{1}",
+                hidden: true,
+                pointStyle: "POINT",
+                lineStyle: "SOLID",
+                points: true,
+                lines: false,
+                dragMode: "NONE",
+                values: ["-3", "-2", "-1", "0", "1", "2", "3"],
+              },
+              {
+                latex: equation,
+                hidden: false,
+                pointStyle: "POINT",
+                lineStyle: "SOLID",
+                points: true,
+                lines: true,
+                dragMode: "NONE",
+                values: ["", "", "", "", "", "", ""],
+              },
+            ],
+          });
+        }
+        /**
+         * @param {number} degree
+         * @param {[x: number, y: number][]} points
+         */
+        function createMatrix(degree, points) {
+          const matrix = [];
+          for (let i = 0; i < points.length; i++) {
+            const [x, y] = points[i];
+            const row = [];
+
+            if (x === 0) continue;
+
+            for (let i1 = degree; i1 >= 0; i1--) {
+              row.push(new Fraction(x ** i1));
+            }
+            row.push(new Fraction(y));
+            matrix.push(row);
+          }
+          return matrix;
+        }
+        /** @param {Fraction[][]} matrix */
+        function solveMatrix(matrix, showSteps) {
+          const matrices = [];
+          for (let x = 0; x < matrix.length; x++) {
+            const row = matrix[x];
+            /* This divides the equation to set the number at [x][x] to 1 */
+            let a = row[x].copy();
+            for (let z = 0; z < row.length; z++) row[z].divide(a);
+            if (showSteps) {
+              matrices.push({
+                message: `R${x + 1} = R${x + 1} / ${a}`,
+                matrix: Array.from(matrix, (el) =>
+                  Array.from(el, (f) => `${f}`)
+                ),
+              });
+            }
+
+            for (let y = 0; y < matrix.length; y++) {
+              if (y === x) continue;
+
+              const rowToChange = matrix[y];
+              const a = rowToChange[x].copy();
+              /* This sets the other rows in column x to 0 */
+              for (let z = x; z < row.length; z++)
+                rowToChange[z].subtract(row[z].copy().multiply(a));
+
+              if (showSteps) {
+                let sign = "-";
+                if (a.toNumber() < 0) sign = "+";
+                let coefficient = "";
+                if (Math.abs(a.toNumber()) !== 1) coefficient = ` ${a.abs()} *`;
+                matrices.push({
+                  message: `R${y + 1} = R${y + 1} ${sign}${coefficient} R${
+                    x + 1
+                  }`,
+                  matrix: Array.from(matrix, (el) =>
+                    Array.from(el, (f) => `${f}`)
+                  ),
+                });
+              }
+            }
+          }
+          return showSteps ? matrices : matrix;
+        }
+        /** @param {Fraction[][]} matrix */
+        function addMatrix(matrix, message) {
+          const width = matrix[0].length;
+          const height = matrix.length;
+
+          const table = document.createElement("table");
+          const head = table.createTHead();
+          const body = table.createTBody();
+          const header = head.insertRow();
+          if (message) table.createCaption().innerText = message;
+
+          for (let x = 0; x < width; x++) {
+            const th = header.appendChild(document.createElement("th"));
+            th.classList.add("math");
+            th.innerText = String.fromCharCode(97 + x);
+            if (x === width - 1) {
+              th.innerText = "y";
+            }
+          }
+
+          for (let x = 0; x < matrix.length; x++) {
+            const row = matrix[x];
+            const tr = body.insertRow();
+            for (let y = 0; y < row.length; y++) {
+              const value = row[y];
+              const td = tr.insertCell();
+              td.innerText = value;
+            }
+          }
+
+          document.querySelector("[data-matrices]").appendChild(table);
+        }
+        function loadExample() {
+          const table = document.querySelector(
+            "[data-table-of-values] > tbody"
+          );
+          const points = [
+            ["-5", "5870"],
+            ["-4", "1852"],
+            ["-3", "402"],
+            ["-2", "38"],
+            ["-1", "-2"],
+            ["0", "0"],
+            ["1", "2"],
+            ["2", "-38"],
+            ["3", "-402"],
+            ["4", "-1852"],
+          ];
+          for (let i = 0; i < points.length; i++) {
+            const [x, y] = points[i];
+
+            table.rows[i].cells[0].innerText = x;
+            table.rows[i].cells[1].innerText = y;
+            if (i < points.length - 1)
+              table.rows[i].cells[1].dispatchEvent(
+                new KeyboardEvent("keydown", { key: "Tab" })
+              );
+          }
+        }
+        function sup(data) {
+          const sup = document.createElement("sup");
+          sup.innerText = data;
+          return sup;
+        }
+        function resetEquation() {
+          document.querySelector("[data-equation]").innerText = "";
+        }
+        function resetMatrices() {
+          document.querySelector("[data-matrices]").innerHTML = "";
+        }
+        function resetGraph() {
+          desmos?.setExpression?.({ id: "2", type: "table" });
+        }
+        /** @param {number} n */
+        function stringify(n, showSign = true) {
+          return (n || 0).toLocaleString("en", {
+            maximumFractionDigits: 5,
+            signDisplay: showSign ? "auto" : "never",
+          });
+        }
+        var showingSteps = false;
+        function toggleSteps(ev) {
+          showingSteps = !showingSteps;
+          ev.target.innerText = showingSteps ? "Hide Steps" : "Show Steps";
+          calculate();
+        }
+        function clear() {
+          const table = resetTable();
+          resetMatrices();
+          resetEquation();
+          resetGraph();
+
+          table.tBodies[0]?.remove();
+          const tr = table.createTBody().insertRow();
+          tr.appendChild(createCell());
+          tr.appendChild(createCell());
+        }
+
+        const tr = document
+          .querySelector("[data-table-of-values] > tbody")
+          .insertRow();
+        tr.appendChild(createCell());
+        tr.appendChild(createCell());
+
+        const calcButton = document.querySelector(
+          "[data-table-of-values-button=calculate]"
+        );
+        calcButton.addEventListener("click", calculate);
+        const exampleButton = document.querySelector(
+          "[data-table-of-values-button=example]"
+        );
+        exampleButton.addEventListener("click", loadExample);
+        const stepsButton = document.querySelector(
+          "[data-table-of-values-button=show-steps]"
+        );
+        stepsButton.addEventListener("click", toggleSteps);
+        const clearButton = document.querySelector(
+          "[data-table-of-values-button=clear]"
+        );
+        clearButton.addEventListener("click", clear);
+
+        var desmos = {};
+        function initialiseDesmos() {
+          if (typeof Desmos !== "undefined") {
+            desmos = new Desmos.Calculator(
+              document.querySelector("[data-graph]")
+            );
+            desmos.controller._hideExpressions();
+            desmos.controller.updateViews();
+          }
+        }
+        window.initialiseDesmos = initialiseDesmos;
+      })();
+    </script>
+    <script
+      src="https://unpkg.com/desmos@1.5.4/index.js"
+      onload="window.initialiseDesmos()"
+    ></script>
+  </body>
+</html>
