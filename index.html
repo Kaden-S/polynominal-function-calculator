@@ -688,7 +688,7 @@
             const points = JSON.parse(
               new URLSearchParams(window.location.search.slice(1)).get("points")
             );
-            loadPoints(points);
+            if (Array.isArray(points) && points.length > 0) loadPoints(points);
           } catch (_err) {}
           calculate();
         }
