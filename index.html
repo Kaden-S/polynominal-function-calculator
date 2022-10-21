@@ -2,25 +2,6 @@
 <html>
   <head>
     <title>Polynominal Function Calculator</title>
-  </head>
-  <body>
-    <table data-table-of-values>
-      <thead>
-        <tr>
-          <th class="math">x</th>
-          <th class="math">y</th>
-        </tr>
-      </thead>
-      <tbody></tbody>
-      <tfoot></tfoot>
-    </table>
-    <button data-table-of-values-button="example">Load Example</button>
-    <button data-table-of-values-button="calculate">Calculate</button>
-    <button data-table-of-values-button="show-steps">Show Steps</button>
-    <button data-table-of-values-button="clear">Clear</button>
-    <div data-matrices></div>
-    <h2 data-equation></h2>
-    <div data-graph></div>
     <style>
       html {
         height: 100%;
@@ -57,10 +38,30 @@
     <script src="./src/matrix.js"></script>
     <script src="./src/math.js"></script>
     <script src="./src/util.js"></script>
-    <script src="./src/index.js"></script>
     <script
+      async
       src="https://unpkg.com/desmos@1.5.4/index.js"
       onload="window.initialiseDesmos()"
     ></script>
+  </head>
+  <body>
+    <table data-table-of-values>
+      <thead>
+        <tr>
+          <th class="math">x</th>
+          <th class="math">y</th>
+        </tr>
+      </thead>
+      <tbody></tbody>
+      <tfoot></tfoot>
+    </table>
+    <button data-table-of-values-button="example">Load Example</button>
+    <button data-table-of-values-button="calculate">Calculate</button>
+    <button data-table-of-values-button="show-steps">Show Steps</button>
+    <button data-table-of-values-button="clear">Clear</button>
+    <div data-matrices></div>
+    <h2 data-equation></h2>
+    <div data-graph></div>
+    <script src="./src/index.js"></script>
   </body>
 </html>

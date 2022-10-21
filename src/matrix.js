@@ -73,32 +73,34 @@ function matrix(degree, points) {
     .slice(6)
     .replace(/x/g, "x_{1}")
     .replace(/x_\{1\}(\d+)/g, "x_{1}^{$1}");
-  desmos?.setExpression?.({
-    id: "2",
-    type: "table",
-    columns: [
-      {
-        latex: "x_{1}",
-        hidden: true,
-        pointStyle: "POINT",
-        lineStyle: "SOLID",
-        points: true,
-        lines: false,
-        dragMode: "NONE",
-        values: ["-3", "-2", "-1", "0", "1", "2", "3"],
-      },
-      {
-        latex: equation,
-        hidden: false,
-        pointStyle: "POINT",
-        lineStyle: "SOLID",
-        points: true,
-        lines: true,
-        dragMode: "NONE",
-        values: ["", "", "", "", "", "", ""],
-      },
-    ],
-  });
+  desmos.then((d) =>
+    d?.setExpression?.({
+      id: "2",
+      type: "table",
+      columns: [
+        {
+          latex: "x_{1}",
+          hidden: true,
+          pointStyle: "POINT",
+          lineStyle: "SOLID",
+          points: true,
+          lines: false,
+          dragMode: "NONE",
+          values: ["-3", "-2", "-1", "0", "1", "2", "3"],
+        },
+        {
+          latex: equation,
+          hidden: false,
+          pointStyle: "POINT",
+          lineStyle: "SOLID",
+          points: true,
+          lines: true,
+          dragMode: "NONE",
+          values: ["", "", "", "", "", "", ""],
+        },
+      ],
+    })
+  );
   const url = new URL(window.location);
   url.searchParams.set("points", JSON.stringify(points));
   url.searchParams.set("steps", showingSteps);

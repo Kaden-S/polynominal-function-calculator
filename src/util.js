@@ -195,11 +195,16 @@ function resetMatrices() {
   document.querySelector("[data-matrices]").innerHTML = "";
 }
 function resetGraph() {
-  desmos?.setExpression?.({
-    id: "2",
-    type: "table",
-    columns: [{ values: [] }],
-  });
+  Promise.race([
+    desmos.then((d) =>
+      d?.setExpression?.({
+        id: "2",
+        type: "table",
+        columns: [{ values: [] }],
+      })
+    ),
+    Promise.resolve(),
+  ]);
 }
 /** @param {number} n */
 function stringify(n, showSign = true) {
@@ -227,27 +232,27 @@ function clear() {
 }
 function initialiseDesmos() {
   if (typeof Desmos !== "undefined") {
-    desmos = new Desmos.Calculator(document.querySelector("[data-graph]"));
-    desmos.controller._hideExpressions();
-    desmos.controller.updateViews();
+    if (!window.resolveDesmos) {
+      // Although mostly unnecessary, this should elimate race conditions
+      waitUntil(
+        () => window.resolveDesmos,
+        () => initialiseDesmos()
+      );
+      return;
+    }
+    const d = new Desmos.Calculator(document.querySelector("[data-graph]"));
+    d.controller._hideExpressions();
+    d.controller.updateViews();
+    window.resolveDesmos(d);
   }
+}
+/**
+ * @param {() => boolean} predicate
+ * @param {() => void} callback
+ */
+function waitUntil(predicate, callback) {
+  if (predicate()) return void callback();
 
-  const params = new URLSearchParams(window.location.search.slice(1));
-  try {
-    if (Boolean(JSON.parse(params.get("steps"))) ?? false) {
-      toggleSteps({
-        target: document.querySelector(
-          "[data-table-of-values-button=show-steps]"
-        ),
-      });
-    }
-  } catch (_err) {}
-  try {
-    const points = JSON.parse(params.get("points"));
-    if (Array.isArray(points) && points.length > 0) {
-      loadPoints(points);
-      calculate();
-    }
-  } catch (_err) {}
+  setTimeout(() => waitUntil(predicate, callback), 10);
 }
 window.initialiseDesmos = initialiseDesmos;
