@@ -192,7 +192,11 @@ function resetMatrices() {
   document.querySelector("[data-matrices]").innerHTML = "";
 }
 function resetGraph() {
-  desmos?.setExpression?.({ id: "2", type: "table" });
+  desmos?.setExpression?.({
+    id: "2",
+    type: "table",
+    columns: [{ values: [] }],
+  });
 }
 /** @param {number} n */
 function stringify(n, showSign = true) {
