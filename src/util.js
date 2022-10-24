@@ -155,7 +155,7 @@ function calculate() {
   for (let x = 0; x < 10; x++) {
     const diff = addDifference(x);
     if (diff !== false) {
-      const span = t.tFoot.appendChild(document.createElement("span"))
+      const span = t.tFoot.appendChild(document.createElement("span"));
       span.innerText =
         "expected\n" +
         `a = ${diff}/${x + 1}!\n` +
@@ -326,6 +326,46 @@ function clear() {
   const tr = table.createTBody().insertRow();
   tr.appendChild(createCell());
   tr.appendChild(createCell());
+}
+function setDesmosEquation(equation) {
+  desmos.then((d) =>
+    d?.setExpression?.({
+      id: "2",
+      type: "table",
+      columns: [
+        {
+          latex: "x_{1}",
+          hidden: true,
+          pointStyle: "POINT",
+          lineStyle: "SOLID",
+          points: true,
+          lines: false,
+          dragMode: "NONE",
+          values: ["-3", "-2", "-1", "0", "1", "2", "3"],
+        },
+        {
+          latex: equation,
+          hidden: false,
+          pointStyle: "POINT",
+          lineStyle: "SOLID",
+          points: true,
+          lines: true,
+          dragMode: "NONE",
+          values: ["", "", "", "", "", "", ""],
+        },
+      ],
+    })
+  );
+}
+function setURLParams(points, steps, equation) {
+  // TODO: create a listener for history changes so clicking the back
+  //       arrow will go to the previous state
+  const title = document.title;
+  const params = new URLSearchParams({ points, steps }).toString();
+
+  document.title = equation;
+  window.history.pushState(null, null, `?${params}`);
+  document.title = title;
 }
 function initialiseDesmos() {
   if (typeof Desmos !== "undefined") {

@@ -71,46 +71,13 @@ function matrix(degree, points) {
     }
   }
 
-  const equation = output.innerText
-    .slice(6)
+  const equation = output.innerText.slice(7).replace(/x(\d+)/g, "x^$1");
+  const latexEquation = output.innerText
+    .slice(7)
     .replace(/x/g, "x_{1}")
     .replace(/x_\{1\}(\d+)/g, "x_{1}^{$1}");
-  desmos.then((d) =>
-    d?.setExpression?.({
-      id: "2",
-      type: "table",
-      columns: [
-        {
-          latex: "x_{1}",
-          hidden: true,
-          pointStyle: "POINT",
-          lineStyle: "SOLID",
-          points: true,
-          lines: false,
-          dragMode: "NONE",
-          values: ["-3", "-2", "-1", "0", "1", "2", "3"],
-        },
-        {
-          latex: equation,
-          hidden: false,
-          pointStyle: "POINT",
-          lineStyle: "SOLID",
-          points: true,
-          lines: true,
-          dragMode: "NONE",
-          values: ["", "", "", "", "", "", ""],
-        },
-      ],
-    })
-  );
-  const url = new URL(window.location);
-  url.searchParams.set("points", JSON.stringify(allPoints));
-  url.searchParams.set("steps", showingSteps);
-  window.history.pushState(
-    null,
-    output.innerText.slice(7).replace(/x(\d+)/g, "x^$1"),
-    url.toString()
-  );
+  setDesmosEquation(latexEquation);
+  setURLParams(allPoints, showingSteps, equation);
 }
 /**
  * @param {number} degree
