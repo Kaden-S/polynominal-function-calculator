@@ -361,7 +361,7 @@ function setURLParams(points, steps, equation) {
   // TODO: create a listener for history changes so clicking the back
   //       arrow will go to the previous state
   const title = document.title;
-  const params = new URLSearchParams({ points, steps }).toString();
+  const params = new URLSearchParams({ points: JSON.stringify(points), steps }).toString();
 
   document.title = equation;
   window.history.pushState(null, null, `?${params}`);
