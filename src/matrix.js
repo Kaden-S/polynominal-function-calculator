@@ -15,24 +15,24 @@ function runMatrix(degree) {
 }
 function matrix(degree, points) {
   const showSteps = showingSteps;
-  const matrix = createMatrix(degree, points);
   const targetLength = degree + 1;
 
-  if (matrix.length < targetLength) {
+  if (points.length < targetLength) {
     alert("Add more points");
     return null;
   }
 
-  while (matrix.length !== targetLength) {
-    if (matrix.length % 2 === 0) {
-      matrix.pop();
+  while (points.length !== targetLength) {
+    if (points.length % 2 === 0) {
+      points.pop();
     } else {
-      matrix.shift();
+      points.shift();
     }
   }
 
+  const matrix = createMatrix(degree, points);
   if (showSteps) addPointsMatrix(degree, points);
-  addMatrix(matrix, showSteps ? "Remove variable letters and excess rows" : "");
+  addMatrix(matrix, showSteps ? "Remove variable letters" : "");
   let solved = solveMatrix(matrix, showSteps);
   if (showSteps) {
     solved.forEach(({ matrix, message }) => addMatrix(matrix, message));
@@ -121,8 +121,6 @@ function createMatrix(degree, points) {
     const [x, y] = points[i];
     const row = [];
 
-    if (x === 0) continue;
-
     for (let i1 = degree; i1 >= 0; i1--) {
       row.push(new Fraction(x ** i1));
     }
@@ -138,12 +136,39 @@ function solveMatrix(matrix, showSteps) {
     const row = matrix[x];
     /* This divides the equation to set the number at [x][x] to 1 */
     let a = row[x].copy();
-    for (let z = 0; z < row.length; z++) row[z].divide(a);
-    if (showSteps) {
-      matrices.push({
-        message: `R${x + 1} = R${x + 1} / ${a}`,
-        matrix: Array.from(matrix, (el) => Array.from(el, (f) => `${f}`)),
-      });
+
+    if (a.toNumber() === 0) {
+      /* If [x][x] is 0, add the first non-zero row */
+      const otherRowIndex = matrix.findIndex((row, i) => i > x && row[x] !== 0);
+      const otherRow = matrix[otherRowIndex];
+      if (!otherRow) {
+        alert("Couldn't complete the matrix");
+        return null;
+      }
+      const factor = otherRow[x].copy().inverse();
+
+      for (let z = 0; z < row.length; z++)
+        row[z].add(otherRow[z].copy().multiply(factor));
+
+      if (showSteps) {
+        let sign = "+";
+        if (otherRow[x].toNumber() < 0) sign = "-";
+        let coefficient = "";
+        if (Math.abs(otherRow[x].toNumber()) !== 1)
+          coefficient = ` ${factor.abs()} *`;
+        matrices.push({
+          message: `R${x + 1} = R${x + 1} ${sign}${coefficient} R${otherRowIndex + 1}`,
+          matrix: Array.from(matrix, (el) => Array.from(el, (f) => `${f}`)),
+        });
+      }
+    } else {
+      for (let z = 0; z < row.length; z++) row[z].divide(a);
+      if (showSteps) {
+        matrices.push({
+          message: `R${x + 1} = R${x + 1} / ${a}`,
+          matrix: Array.from(matrix, (el) => Array.from(el, (f) => `${f}`)),
+        });
+      }
     }
 
     for (let y = 0; y < matrix.length; y++) {
