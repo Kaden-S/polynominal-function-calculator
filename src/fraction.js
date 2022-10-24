@@ -107,6 +107,13 @@
       this.numerator = Math.abs(this.numerator);
       return this;
     }
+    inverse() {
+      const n = this.numerator;
+      this.numerator = this.denominator;
+      this.denominator = n;
+
+      return this;
+    }
   }
   window.Fraction = Fraction;
 })();

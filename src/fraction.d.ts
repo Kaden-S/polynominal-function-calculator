@@ -20,4 +20,5 @@ declare class Fraction {
   toNumber(): number;
   copy(): Fraction;
   abs(): Fraction;
+  inverse(): Fraction;
 }
