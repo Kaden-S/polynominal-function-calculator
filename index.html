@@ -27,9 +27,16 @@
         font-family: sans-serif;
       }
       table {
-        /* border: 1px solid black; */
         margin-block: 1.5rem;
         border-spacing: 0;
+      }
+      tfoot {
+        position: relative;
+        height: 3.6rem;
+      }
+      tfoot > span {
+        position: absolute;
+        inset: 0;
       }
       td, th {
         border: 1px solid black;
@@ -59,7 +66,9 @@
         </tr>
       </thead>
       <tbody></tbody>
-      <tfoot></tfoot>
+      <tfoot>
+        <span></span>
+      </tfoot>
     </table>
     <button data-table-of-values-button="example">Load Example</button>
     <button data-table-of-values-button="calculate">Calculate</button>

@@ -155,7 +155,11 @@ async function calculate() {
   for (let x = 0; x < 10; x++) {
     const diff = addDifference(x);
     if (diff !== false) {
-      t.tFoot.innerText = `a = ${diff}/${x + 1}! = ${diff / factorial(x + 1)}`;
+      const span = t.tFoot.appendChild(document.createElement("span"))
+      span.innerText =
+        "expected\n" +
+        `a = ${diff}/${x + 1}!\n` +
+        `a = ${diff / factorial(x + 1)}`;
       runMatrix(x + 1);
       break;
     }
@@ -264,15 +268,20 @@ function solvePointInEquation(degree, point) {
 function convertEquationToMatrixRow(parts) {
   const row = [];
   const y = parts.shift().replace(" = ", "");
-  
-  row.push(...parts.filter(el => el !== " + ").reduce((p, c, i) => {
-    if(typeof c === "number" || typeof c === "string") {
-      p.push([c]);
-    } else {
-      p[p.length - 1]?.push(c);
-    }
-    return p;
-  }, []), y);
+
+  row.push(
+    ...parts
+      .filter((el) => el !== " + ")
+      .reduce((p, c, i) => {
+        if (typeof c === "number" || typeof c === "string") {
+          p.push([c]);
+        } else {
+          p[p.length - 1]?.push(c);
+        }
+        return p;
+      }, []),
+    y
+  );
 
   return row;
 }
