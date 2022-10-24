@@ -147,7 +147,7 @@ function resetTable() {
 function removeExcessCells(tr) {
   while (tr.cells.item(2)) tr.cells.item(2).remove();
 }
-async function calculate() {
+function calculate() {
   const t = resetTable();
   resetMatrices();
   resetEquation();
