@@ -81,6 +81,13 @@ function addRow(row, body) {
   tr.appendChild(createCell());
   return tr;
 }
+/**
+ * @param {HTMLTableRowElement} row
+ * @param {HTMLTableSectionElement} body
+ */
+function removeRow(row, body) {
+  if (body.rows.length > 1) body.removeChild(row);
+}
 /** @param {KeyboardEvent} ev */
 function keyListener(ev) {
   /** @type {HTMLTableDataCellElement} */
@@ -130,6 +137,20 @@ function keyListener(ev) {
       }
 
       moveDown(td);
+      break;
+    case "Backspace":
+      if (atStart(td)) {
+        ev.preventDefault();
+
+        if (td === row.cells[Y]) {
+          moveLeft(td);
+          break;
+        }
+
+        moveUp(row.cells[Y]);
+        removeRow(row, body);
+      }
+
       break;
     default:
       break;
@@ -361,7 +382,10 @@ function setURLParams(points, steps, equation) {
   // TODO: create a listener for history changes so clicking the back
   //       arrow will go to the previous state
   const title = document.title;
-  const params = new URLSearchParams({ points: JSON.stringify(points), steps }).toString();
+  const params = new URLSearchParams({
+    points: JSON.stringify(points),
+    steps,
+  }).toString();
 
   document.title = equation;
   window.history.pushState(null, null, `?${params}`);
