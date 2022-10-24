@@ -14,6 +14,7 @@ function runMatrix(degree) {
   }
 }
 function matrix(degree, points) {
+  const allPoints = Array.from(points);
   const showSteps = showingSteps;
   const targetLength = degree + 1;
 
@@ -103,7 +104,7 @@ function matrix(degree, points) {
     })
   );
   const url = new URL(window.location);
-  url.searchParams.set("points", JSON.stringify(points));
+  url.searchParams.set("points", JSON.stringify(allPoints));
   url.searchParams.set("steps", showingSteps);
   window.history.pushState(
     null,
@@ -157,7 +158,9 @@ function solveMatrix(matrix, showSteps) {
         if (Math.abs(otherRow[x].toNumber()) !== 1)
           coefficient = ` ${factor.abs()} *`;
         matrices.push({
-          message: `R${x + 1} = R${x + 1} ${sign}${coefficient} R${otherRowIndex + 1}`,
+          message: `R${x + 1} = R${x + 1} ${sign}${coefficient} R${
+            otherRowIndex + 1
+          }`,
           matrix: Array.from(matrix, (el) => Array.from(el, (f) => `${f}`)),
         });
       }
