@@ -31,7 +31,8 @@ function matrix(degree, points) {
     }
   }
 
-  addMatrix(matrix);
+  if (showSteps) addPointsMatrix(degree, points);
+  addMatrix(matrix, showSteps ? "Remove variable letters and excess rows" : "");
   let solved = solveMatrix(matrix, showSteps);
   if (showSteps) {
     solved.forEach(({ matrix, message }) => addMatrix(matrix, message));
@@ -168,7 +169,23 @@ function solveMatrix(matrix, showSteps) {
   }
   return showSteps ? matrices : matrix;
 }
-/** @param {Fraction[][]} matrix */
+function addPointsMatrix(degree, points) {
+  const wrapper = document.querySelector("[data-matrices]");
+  const startEquation = wrapper.appendChild(document.createElement("h2"));
+
+  startEquation.append(...createBaseEquation(degree));
+
+  const matrix1 = points.map((point) =>
+    convertEquationToMatrixRow(insertPointIntoEquation(degree, point))
+  );
+  addMatrix(matrix1, "Sub points into the equation");
+
+  const matrix2 = points.map((point) =>
+    convertEquationToMatrixRow(solvePointInEquation(degree, point))
+  );
+  addMatrix(matrix2, "Simplify exponents");
+}
+/** @param {(Fraction | Array<string | Node>)[][]} matrix */
 function addMatrix(matrix, message) {
   const width = matrix[0].length;
   const height = matrix.length;
@@ -194,7 +211,11 @@ function addMatrix(matrix, message) {
     for (let y = 0; y < row.length; y++) {
       const value = row[y];
       const td = tr.insertCell();
-      td.innerText = value;
+      if (Array.isArray(value)) {
+        td.append(...value);
+      } else {
+        td.innerText = value;
+      }
     }
   }
 

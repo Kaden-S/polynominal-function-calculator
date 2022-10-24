@@ -188,6 +188,94 @@ function sup(data) {
   sup.innerText = data;
   return sup;
 }
+/**
+ * @param {number} degree
+ * @returns {Array<Node | string>}
+ */
+function createBaseEquation(degree) {
+  const parts = [];
+
+  parts.push("y = ");
+  for (let x = 0; x < degree + 1; x++) {
+    const exponent = degree - x;
+    const coefficient = String.fromCharCode(97 + x);
+
+    if (exponent !== 0) {
+      parts.push(coefficient + "x");
+
+      if (exponent !== 1) parts.push(sup(exponent));
+
+      parts.push(" + ");
+    } else parts.push(coefficient);
+  }
+
+  return parts;
+}
+/**
+ * @param {number} degree
+ * @param {[number, number]} point
+ * @returns {Array<Node | string>}
+ */
+function insertPointIntoEquation(degree, point) {
+  const parts = [];
+  const [X, Y] = point;
+
+  parts.push(Y + " = ");
+  for (let x = 0; x < degree + 1; x++) {
+    const exponent = degree - x;
+    const coefficient = String.fromCharCode(97 + x);
+
+    if (exponent !== 0) {
+      parts.push(`${coefficient}(${X})`);
+
+      if (exponent !== 1) parts.push(sup(exponent));
+
+      parts.push(" + ");
+    } else parts.push(coefficient);
+  }
+
+  return parts;
+}
+/**
+ * @param {number} degree
+ * @param {[number, number]} point
+ * @returns {Array<Node | string>}
+ */
+function solvePointInEquation(degree, point) {
+  const parts = [];
+  const [X, Y] = point;
+
+  parts.push(Y + " = ");
+  for (let x = 0; x < degree + 1; x++) {
+    const exponent = degree - x;
+    const coefficient = String.fromCharCode(97 + x);
+    const value = X ** exponent;
+
+    if (exponent !== 0) {
+      parts.push(`${value}${coefficient}`);
+
+      parts.push(" + ");
+    } else parts.push(coefficient);
+  }
+
+  return parts;
+}
+/** @param {(Node | string)[]} parts */
+function convertEquationToMatrixRow(parts) {
+  const row = [];
+  const y = parts.shift().replace(" = ", "");
+  
+  row.push(...parts.filter(el => el !== " + ").reduce((p, c, i) => {
+    if(typeof c === "number" || typeof c === "string") {
+      p.push([c]);
+    } else {
+      p[p.length - 1]?.push(c);
+    }
+    return p;
+  }, []), y);
+
+  return row;
+}
 function resetEquation() {
   document.querySelector("[data-equation]").innerText = "";
 }
